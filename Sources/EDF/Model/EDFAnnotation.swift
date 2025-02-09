@@ -20,6 +20,7 @@ extension EDFAnnotation {
     }
 }
 
+// https://www.edfplus.info/specs/edfplus.html
 extension EDFAnnotation {
     public var timestamp: Double? {
         let separator = CtrlCharactor.separator

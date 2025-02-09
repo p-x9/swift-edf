@@ -12,7 +12,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "EDF"
+            name: "EDF",
+            dependencies: [
+                "EDFC"
+            ]
+        ),
+        .target(
+            name: "EDFC"
         ),
         .testTarget(
             name: "EDFTests",

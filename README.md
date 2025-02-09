@@ -4,10 +4,10 @@ A Swift package for reading [EDF(European Data Format)](https://www.edfplus.info
 
 <!-- # Badges -->
 
-[![Github issues](https://img.shields.io/github/issues/p-x9/EDF)](https://github.com/p-x9/EDF/issues)
-[![Github forks](https://img.shields.io/github/forks/p-x9/EDF)](https://github.com/p-x9/EDF/network/members)
-[![Github stars](https://img.shields.io/github/stars/p-x9/EDF)](https://github.com/p-x9/EDF/stargazers)
-[![Github top language](https://img.shields.io/github/languages/top/p-x9/EDF)](https://github.com/p-x9/EDF/)
+[![Github issues](https://img.shields.io/github/issues/p-x9/swift-edf)](https://github.com/p-x9/swift-edf/issues)
+[![Github forks](https://img.shields.io/github/forks/p-x9/swift-edf)](https://github.com/p-x9/swift-edf/network/members)
+[![Github stars](https://img.shields.io/github/stars/p-x9/swift-edf)](https://github.com/p-x9/swift-edf/stargazers)
+[![Github top language](https://img.shields.io/github/languages/top/p-x9/swift-edf)](https://github.com/p-x9/swift-edf/)
 
 ## Usage
 

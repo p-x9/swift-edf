@@ -34,13 +34,13 @@ extension EDFSignalInfo {
     /// physical dimension (e.g. uV or degreeC)
     public var physicalDimension: String { raw.physicalDimension }
     /// physical minimum (e.g. -500 or 34)
-    public var physicalMinimum: Int { .init(raw.physicalMinimum)! }
+    public var physicalMinimum: Double { .init(raw.physicalMinimum)! }
     /// physical maximum (e.g. 500 or 40)
-    public var physicalMaximum: Int { .init(raw.physicalMaximum)! }
+    public var physicalMaximum: Double { .init(raw.physicalMaximum)! }
     /// digital minimum (e.g. -2048)
-    public var digitalMinimum: Int { .init(raw.digitalMinimum)! }
+    public var digitalMinimum: Double { .init(raw.digitalMinimum)! }
     /// digital maximum (e.g. 2047)
-    public var digitalMaximum: Int { .init(raw.digitalMaximum)! }
+    public var digitalMaximum: Double { .init(raw.digitalMaximum)! }
     /// prefiltering (e.g. HP:0.1Hz LP:75Hz)
     public var prefiltering: String { raw.prefiltering }
     /// number of samples in each data record

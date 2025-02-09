@@ -47,22 +47,22 @@ extension EDFHeader {
         Int(_headerRecordSize)!
     }
 
-    public var _numberOfDataRecords: String {
+    public var _numberOfRecords: String {
         String(tuple: layout.number_of_data_records)
             .trimmedTrailingWhiteSpaces
     }
 
-    public var numberOfDataRecords: Int {
-        Int(_numberOfDataRecords)!
+    public var numberOfRecords: Int {
+        Int(_numberOfRecords)!
     }
 
-    public var _durationOfDataRecord: String {
+    public var _durationOfRecord: String {
         String(tuple: layout.duration_of_data_record)
             .trimmedTrailingWhiteSpaces
     }
 
-    public var durationOfDataRecord: Double {
-        Double(_durationOfDataRecord)!
+    public var durationOfRecord: Double {
+        Double(_durationOfRecord)!
     }
 
     public var _numberOfSignals: String {

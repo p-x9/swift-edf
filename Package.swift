@@ -10,11 +10,15 @@ let package = Package(
             targets: ["EDF"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/p-x9/swift-fileio.git", from: "0.1.0")
+    ],
     targets: [
         .target(
             name: "EDF",
             dependencies: [
-                "EDFC"
+                "EDFC",
+                .product(name: "FileIO", package: "swift-fileio")
             ]
         ),
         .target(

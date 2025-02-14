@@ -27,23 +27,23 @@ final class EDFTests: XCTestCase {
         print("Number of Signals:", header.numberOfSignals)
     }
 
-    func testSignalInfo() {
-        print("Label:", edf.labels)
-        print("Transducer Type:", edf.transducerTypes)
-        print("Physical Dimension:", edf.physicalDimensions)
-        print("Physical Minimum:", edf.physicalMinimums)
-        print("Physical Maximum:", edf.physicalMaximums)
-        print("Digital Minimum:", edf.digitalMinimums)
-        print("Digital Maximum:", edf.digitalMaximums)
-        print("Prefiltering:", edf.prefilterings)
-        print("Samples/Record:", edf.numberOfSamplesInEachDataRecords)
-        print("Reserved:", edf._reserveds)
+    func testSignalInfo() throws {
+        print("Label:", try edf.labels)
+        print("Transducer Type:", try edf.transducerTypes)
+        print("Physical Dimension:", try edf.physicalDimensions)
+        print("Physical Minimum:", try edf.physicalMinimums)
+        print("Physical Maximum:", try edf.physicalMaximums)
+        print("Digital Minimum:", try edf.digitalMinimums)
+        print("Digital Maximum:", try edf.digitalMaximums)
+        print("Prefiltering:", try edf.prefilterings)
+        print("Samples/Record:", try edf.numberOfSamplesInEachDataRecords)
+        print("Reserved:", try edf._reserveds)
     }
 
-    func testSignalInfo2() {
+    func testSignalInfo2() throws {
         let numberOfSignals = edf.header.numberOfSignals
         for i in 0 ..< numberOfSignals {
-            guard let info = edf.signalInfo(for: i) else {
+            guard let info = try edf.signalInfo(for: i) else {
                 continue
             }
             print("[\(i)]")
@@ -62,8 +62,8 @@ final class EDFTests: XCTestCase {
 }
 
 extension EDFTests {
-    func testAnnotations() {
-        guard let annotations = edf.annotations else {
+    func testAnnotations() throws {
+        guard let annotations = try edf.annotations else {
             return
         }
         for annotation in annotations {

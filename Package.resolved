@@ -1,0 +1,15 @@
+{
+  "originHash" : "ab90740a57f74537c1d4c1323aa51483435884951b4366fc06af5d4cd84233a8",
+  "pins" : [
+    {
+      "identity" : "swift-fileio",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/p-x9/swift-fileio.git",
+      "state" : {
+        "revision" : "63ad61e7d103b800ca40ea95b0b3516474fc42e2",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FileIO
 import EDFC
 
 // Reference:
@@ -15,7 +16,7 @@ import EDFC
 public final class EDFFile {
     public let url: URL
 
-    let fileHandle: FileHandle
+    let fileIO: MemoryMappedFile
 
     public var headerSize: Int {
         header.layoutSize
@@ -29,10 +30,9 @@ public final class EDFFile {
 
     public init(url: URL) throws {
         self.url = url
-        let fileHandle = try FileHandle(forReadingFrom: url)
-        self.fileHandle = fileHandle
+        self.fileIO = try .open(url: url, isWritable: false)
 
-        let header: EDFHeader = fileHandle.read(
+        let header: EDFHeader = try fileIO.read(
             offset: 0
         )
         self.header = header
@@ -43,81 +43,101 @@ public final class EDFFile {
 extension EDFFile {
     /// signal labels (e.g. EEG Fpz-Cz or Body temp)
     public var labels: [String] {
-        dataChunks(of: .label).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .label).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// transducer types (e.g. AgAgCl electrode)
     public var transducerTypes: [String] {
-        dataChunks(of: .transducerType).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .transducerType).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// physical dimensions (e.g. uV or degreeC)
     public var physicalDimensions: [String] {
-        dataChunks(of: .physicalDimension).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .physicalDimension).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// physical minimums (e.g. -500 or 34)
     public var physicalMinimums: [String] {
-        dataChunks(of: .physicalMinimum).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .physicalMinimum).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// physical maximums (e.g. 500 or 40)
     public var physicalMaximums: [String] {
-        dataChunks(of: .physicalMaximum).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .physicalMaximum).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// digital minimums (e.g. -2048)
     public var digitalMinimums: [String] {
-        dataChunks(of: .digitalMinimum).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .digitalMinimum).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// digital maximums (e.g. 2047)
     public var digitalMaximums: [String] {
-        dataChunks(of: .digitalMaximum).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .digitalMaximum).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// prefilterings (e.g. HP:0.1Hz LP:75Hz)
     public var prefilterings: [String] {
-        dataChunks(of: .prefiltering).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .prefiltering).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// number of samples in each data records
     public var numberOfSamplesInEachDataRecords: [String] {
-        dataChunks(of: .numberOfSamplesInEachDataRecord).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .numberOfSamplesInEachDataRecord).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 
     /// reserveds
     public var _reserveds: [String] {
-        dataChunks(of: .reserved).map {
-            String(data: $0)
-                .trimmedTrailingWhiteSpaces
+        get throws {
+            try dataChunks(of: .reserved).map {
+                String(data: $0)
+                    .trimmedTrailingWhiteSpaces
+            }
         }
     }
 }
@@ -128,31 +148,31 @@ extension EDFFile {
     /// (label, transducerType, physicalDimension, ...)
     /// - Parameter column: column of singal
     /// - Returns: signal information
-    public func signalInfo(for column: Int) -> EDFSignalInfo? {
+    public func signalInfo(for column: Int) throws -> EDFSignalInfo? {
         guard column >= 0,
               column < header.numberOfSignals else {
             return nil
         }
-        let label = String(data: dataChunks(of: .label)[column])
+        let label = String(data: try dataChunks(of: .label)[column])
             .trimmedTrailingWhiteSpaces
-        let transducerType = String(data: dataChunks(of: .transducerType)[column])
+        let transducerType = String(data: try dataChunks(of: .transducerType)[column])
             .trimmedTrailingWhiteSpaces
-        let physicalDimension = String(data: dataChunks(of: .physicalDimension)[column])
+        let physicalDimension = String(data: try dataChunks(of: .physicalDimension)[column])
             .trimmedTrailingWhiteSpaces
 
-        let physicalMinimum = String(data: dataChunks(of: .physicalMinimum)[column])
+        let physicalMinimum = String(data: try dataChunks(of: .physicalMinimum)[column])
                 .trimmedTrailingWhiteSpaces
-        let physicalMaximum = String(data: dataChunks(of: .physicalMaximum)[column])
+        let physicalMaximum = String(data: try dataChunks(of: .physicalMaximum)[column])
                 .trimmedTrailingWhiteSpaces
-        let digitalMinimum = String(data: dataChunks(of: .digitalMinimum)[column])
+        let digitalMinimum = String(data: try dataChunks(of: .digitalMinimum)[column])
                 .trimmedTrailingWhiteSpaces
-        let digitalMaximum = String(data: dataChunks(of: .digitalMaximum)[column])
+        let digitalMaximum = String(data: try dataChunks(of: .digitalMaximum)[column])
                 .trimmedTrailingWhiteSpaces
-        let prefiltering = String(data: dataChunks(of: .prefiltering)[column])
+        let prefiltering = String(data: try dataChunks(of: .prefiltering)[column])
             .trimmedTrailingWhiteSpaces
-        let numberOfSamplesInEachDataRecord = String(data: dataChunks(of: .numberOfSamplesInEachDataRecord)[column])
+        let numberOfSamplesInEachDataRecord = String(data: try dataChunks(of: .numberOfSamplesInEachDataRecord)[column])
                 .trimmedTrailingWhiteSpaces
-        let reserved: String = String(data: dataChunks(of: .reserved)[column])
+        let reserved: String = String(data: try dataChunks(of: .reserved)[column])
             .trimmedTrailingWhiteSpaces
 
         let raw: EDFSignalInfo.Raw = .init(
@@ -173,8 +193,10 @@ extension EDFFile {
 
     /// All signal informations
     public var signalInfos: [EDFSignalInfo] {
-        (0 ..< header.numberOfSignals).compactMap { column in
-            signalInfo(for: column)
+        get throws {
+            try (0 ..< header.numberOfSignals).compactMap { column in
+                try signalInfo(for: column)
+            }
         }
     }
 }
@@ -183,9 +205,11 @@ extension EDFFile {
 extension EDFFile {
     /// Size per data record [byte]
     public var recordSize: Int {
-        let numberOfSamplesInEachDataRecords = numberOfSamplesInEachDataRecords
-            .map{ Int($0)! }
-        return MemoryLayout<Int16>.size * numberOfSamplesInEachDataRecords.reduce(0, +)
+        get throws {
+            let numberOfSamplesInEachDataRecords = try numberOfSamplesInEachDataRecords
+                .map{ Int($0)! }
+            return MemoryLayout<Int16>.size * numberOfSamplesInEachDataRecords.reduce(0, +)
+        }
     }
 
 }
@@ -197,23 +221,23 @@ extension EDFFile {
     ///
     /// - Parameter column: column of singal
     /// - Returns: signal
-    public func signal(for column: Int) -> [[Int16]]? {
-        guard let info = signalInfo(for: column) else {
+    public func signal(for column: Int) throws -> [[Int16]]? {
+        guard let info = try signalInfo(for: column) else {
             return nil
         }
         guard !info.isAnnotation else { return nil }
-        guard let startOffsetInRecord = startOffsetInRecord(for: column) else {
+        guard let startOffsetInRecord = try startOffsetInRecord(for: column) else {
             return nil
         }
         let numberOfSamplesInEachDataRecord = info.numberOfSamplesInEachDataRecord
-        let recordSize = recordSize
+        let recordSize = try recordSize
         let offset = headerRecordSize
 
         var records: [[Int16]] = []
 
         for row in 0 ..< header.numberOfRecords {
             let offset = offset + row * recordSize + startOffsetInRecord
-            let samples: DataSequence<Int16> = fileHandle.readDataSequence(
+            let samples: DataSequence<Int16> = try fileIO.readDataSequence(
                 offset: numericCast(offset),
                 numberOfElements: numberOfSamplesInEachDataRecord
             )
@@ -225,31 +249,33 @@ extension EDFFile {
 
     /// Obtains annotations for all records, if any.
     public var annotations: [EDFAnnotation]? {
-        let info = (0 ..< header.numberOfSignals)
-            .compactMap { self.signalInfo(for: $0) }
-            .first(where: { $0.isAnnotation })
-        guard let info else { return nil }
+        get throws {
+            let info = try (0 ..< header.numberOfSignals)
+                .compactMap { try self.signalInfo(for: $0) }
+                .first(where: { $0.isAnnotation })
+            guard let info else { return nil }
 
-        guard let startOffsetInRecord = startOffsetInRecord(for: info.colmun),
-              let colmunRecordSize = recordSize(of: info.colmun) else {
-            return nil
-        }
-        let recordSize = recordSize
-        let offset = headerRecordSize
+            guard let startOffsetInRecord = try startOffsetInRecord(for: info.colmun),
+                  let colmunRecordSize = try recordSize(of: info.colmun) else {
+                return nil
+            }
+            let recordSize = try recordSize
+            let offset = headerRecordSize
 
-        var records: [String] = []
+            var records: [String] = []
 
-        for row in 0 ..< header.numberOfRecords {
-            let offset = offset + row * recordSize + startOffsetInRecord
-            let data = fileHandle.readData(
-                offset: numericCast(offset),
-                size: colmunRecordSize
-            )
-            records.append(String(validating: data))
-        }
+            for row in 0 ..< header.numberOfRecords {
+                let offset = offset + row * recordSize + startOffsetInRecord
+                let data = try fileIO.readData(
+                    offset: numericCast(offset),
+                    length: colmunRecordSize
+                )
+                records.append(String(validating: data))
+            }
 
-        return records.map {
-            .init(raw: $0)
+            return records.map {
+                .init(raw: $0)
+            }
         }
     }
 }
@@ -260,23 +286,23 @@ extension EDFFile {
     ///   - column: column of signal
     ///   - index: index of record
     /// - Returns: Record of the specified signal
-    public func record(for column: Int, at index: Int) -> [Int16]? {
+    public func record(for column: Int, at index: Int) throws -> [Int16]? {
         guard 0 <= index,
               index < header.numberOfRecords else {
             return nil
         }
-        guard let info = signalInfo(for: column) else {
+        guard let info = try signalInfo(for: column) else {
             return nil
         }
         guard !info.isAnnotation else { return nil }
-        guard let startOffsetInRecord = startOffsetInRecord(for: column) else {
+        guard let startOffsetInRecord = try startOffsetInRecord(for: column) else {
             return nil
         }
         let numberOfSamplesInEachDataRecord = info.numberOfSamplesInEachDataRecord
-        let recordSize = recordSize
+        let recordSize = try recordSize
 
         let offset = headerRecordSize + index * recordSize + startOffsetInRecord
-        let samples: DataSequence<Int16> = fileHandle.readDataSequence(
+        let samples: DataSequence<Int16> = try fileIO.readDataSequence(
             offset: numericCast(offset),
             numberOfElements: numberOfSamplesInEachDataRecord
         )
@@ -286,22 +312,22 @@ extension EDFFile {
     /// Annotation of records at the specified index
     /// - Parameter index: index of record
     /// - Returns: annotation
-    public func annotation(at index: Int) -> EDFAnnotation? {
-        let info = (0 ..< header.numberOfSignals)
-            .compactMap { self.signalInfo(for: $0) }
+    public func annotation(at index: Int) throws -> EDFAnnotation? {
+        let info = try (0 ..< header.numberOfSignals)
+            .compactMap { try self.signalInfo(for: $0) }
             .first(where: { $0.isAnnotation })
         guard let info else { return nil }
 
-        guard let startOffsetInRecord = startOffsetInRecord(for: info.colmun),
-              let colmunRecordSize = recordSize(of: info.colmun) else {
+        guard let startOffsetInRecord = try startOffsetInRecord(for: info.colmun),
+              let colmunRecordSize = try recordSize(of: info.colmun) else {
             return nil
         }
-        let recordSize = recordSize
+        let recordSize = try recordSize
 
         let offset = headerRecordSize + index * recordSize + startOffsetInRecord
-        let data = fileHandle.readData(
+        let data = try fileIO.readData(
             offset: numericCast(offset),
-            size: colmunRecordSize
+            length: colmunRecordSize
         )
         return .init(raw: String(validating: data))
     }

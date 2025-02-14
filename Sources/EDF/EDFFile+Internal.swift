@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FileIO
 
 extension EDFFile {
     enum HeaderRecordField: CaseIterable {
@@ -48,10 +49,10 @@ extension EDFFile {
         return offset
     }
 
-    func dataChunks(of field: HeaderRecordField) -> DataChunks {
+    func dataChunks(of field: HeaderRecordField) throws -> DataChunks {
         let offset = startOffset(of: field)
         let elementSize = elementSize(of: field)
-        return fileHandle.readDataChunks(
+        return try fileIO.readDataChunks(
             offset: numericCast(offset),
             chunkSize: elementSize,
             numberOfElements: header.numberOfSignals
@@ -60,20 +61,20 @@ extension EDFFile {
 }
 
 extension EDFFile {
-    func recordSize(of column: Int) -> Int? {
+    func recordSize(of column: Int) throws -> Int? {
         guard column >= 0,
               column < header.numberOfSignals else {
             return nil
         }
-        return Int(numberOfSamplesInEachDataRecords[column])! * MemoryLayout<Int16>.size
+        return Int(try numberOfSamplesInEachDataRecords[column])! * MemoryLayout<Int16>.size
     }
 
-    func startOffsetInRecord(for column: Int) -> Int? {
+    func startOffsetInRecord(for column: Int) throws -> Int? {
         guard column >= 0,
               column < header.numberOfSignals else {
             return nil
         }
-        let numberOfSamplesInEachDataRecords = numberOfSamplesInEachDataRecords[0..<column]
+        let numberOfSamplesInEachDataRecords = try numberOfSamplesInEachDataRecords[0..<column]
         return numberOfSamplesInEachDataRecords.reduce(into: 0) { partialResult, _sample in
             partialResult += Int(_sample)! * MemoryLayout<Int16>.size
         }
